@@ -9,6 +9,11 @@ import path from 'path';
 dotenv.config();
 const app = express();
 
+// routes
+import UserRoute from './routes/userRouter.js';
+
+
+
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
@@ -25,11 +30,15 @@ app.use(cors(coresOptions));
 
 // Database Connection
 connectDB();
-//routes
-app.post('/', (req, res) => {
-    res.send('Hello World');
-    console.log("test api")
-});
+
+
+// apies routes
+app.use('/api/v1/user', UserRoute);
+
+
+
+// Serve static files from the React frontend app
+
 //port
 const port = process.env.PORT || 5000;
 
