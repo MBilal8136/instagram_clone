@@ -126,3 +126,63 @@ const disLikePost = async (req, res) => {
     return res.status(500).json({ message: "Server error", error });
   }
 };
+
+const addNewComment = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.id;
+    const { comment } = req.body;
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res
+        .status(404)
+        .json({ message: "Post not found", success: false });
+    }
+    const newComment = await Comment.create({
+      comment,
+      author: userId,
+      post: postId,
+    });
+    post.comments.push(newComment._id);
+    await post.save();
+    await newComment.populate({
+      path: "author",
+      select: "username profilePic",
+    });
+    return res
+      .status(201)
+      .json({ message: "Comment added successfully", success: true, newComment });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Server error", error });
+  }
+};
+    
+  const getCommentsOnPost = async (req, res) => {
+    try {
+      const postId = req.params.id;
+      const comments = await Comment.find({ post: postId })
+        .populate({ path: "author", select: "username, profilePic" })
+        .sort({ createdAt: -1 });
+        if(!comments) res.stats(404).json({m})
+      return res.status(200).json({
+        message: "Comments fetched successfully",
+        success: true,
+        comments,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server error", error });
+    }
+  }
+  
+
+
+export {
+  addNewPost,
+  getAllPost,
+  getUserPost,
+  likePost,
+  disLikePost,
+  addNewComment,
+};
